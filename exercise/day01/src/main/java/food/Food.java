@@ -1,19 +1,10 @@
 package food;
 
 import java.time.LocalDate;
-import java.util.UUID;
 import java.util.function.Supplier;
 
-public record Food(LocalDate expirationDate,
-                   Boolean approvedForConsumption,
-                   UUID inspectorId) {
+public record Food(ExpirationDate expirationDate, ConsumptionApproval consumption) {
     public boolean isEdible(Supplier<LocalDate> now) {
-        if (this.expirationDate.isAfter(now.get()) &&
-                this.approvedForConsumption &&
-                this.inspectorId != null) {
-            return true;
-        } else {
-            return false;
-        }
+        return expirationDate.hasNotPassed(now.get()) && consumption.isApproved();
     }
 }
