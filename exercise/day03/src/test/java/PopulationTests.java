@@ -3,50 +3,50 @@ import org.junit.jupiter.api.Test;
 import people.Person;
 import people.Pet;
 import people.PetType;
+import people.Population;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static java.lang.Integer.MAX_VALUE;
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
+import static java.util.Arrays.stream;
 import static org.assertj.core.api.Assertions.assertThat;
+import static people.PetType.*;
 
 class PopulationTests {
-    private static List<Person> population;
+    private static Population population;
 
     @BeforeAll
     static void setup() {
-        population = Arrays.asList(
-                new Person("Peter", "Griffin")
-                        .addPet(PetType.CAT, "Tabby", 2),
-                new Person("Stewie", "Griffin")
-                        .addPet(PetType.CAT, "Dolly", 3)
-                        .addPet(PetType.DOG, "Brian", 9),
-                new Person("Joe", "Swanson")
-                        .addPet(PetType.DOG, "Spike", 4),
-                new Person("Lois", "Griffin")
-                        .addPet(PetType.SNAKE, "Serpy", 1),
-                new Person("Meg", "Griffin")
-                        .addPet(PetType.BIRD, "Tweety", 1),
-                new Person("Chris", "Griffin")
-                        .addPet(PetType.TURTLE, "Speedy", 4),
-                new Person("Cleveland", "Brown")
-                        .addPet(PetType.HAMSTER, "Fuzzy", 1)
-                        .addPet(PetType.HAMSTER, "Wuzzy", 2),
-                new Person("Glenn", "Quagmire")
-        );
+        population = aPopulation(
+                with("Peter", "Griffin", having(CAT, "Tabby", 2)),
+                with("Stewie", "Griffin", having(CAT, "Dolly", 3), having(DOG, "Brian", 9)),
+                with("Joe", "Swanson", having(DOG, "Spike", 4)),
+                with("Lois", "Griffin", having(SNAKE, "Serpy", 1)),
+                with("Meg", "Griffin", having(BIRD, "Tweety", 1)),
+                with("Chris", "Griffin", having(TURTLE, "Speedy", 4)),
+                with("Cleveland", "Brown", having(HAMSTER, "Fuzzy", 1), having(HAMSTER, "Wuzzy", 2)),
+                with("Glenn", "Quagmire"));
     }
 
     @Test
     void whoOwnsTheYoungestPet() {
-        var filtered = population.stream().min(Comparator.comparingInt(person -> person.pets().stream().mapToInt(Pet::age).min().orElse(Integer.MAX_VALUE))).orElse(null);
+        var personWithYoungestPet = population.findPersonWithYoungestPet();
 
-        assert filtered != null;
-        assertThat(filtered.firstName()).isEqualTo("Lois");
+        assertThat(personWithYoungestPet).isNotNull();
+        assertThat(personWithYoungestPet)
+                .extracting("firstName", "lastName").containsExactly("Lois", "Griffin");
+    }
+
+    private static Population aPopulation(Person... people) {
+        var population = new Population();
+        stream(people).forEach(population::add);
+        return population;
+    }
+
+    private static Person with(String firstName, String lastName, Pet... pets) {
+        var person = new Person(firstName, lastName);
+        stream(pets).forEach(person::addPet);
+        return person;
+    }
+
+    private static Pet having(PetType type, String name, int age) {
+        return new Pet(type, name, age);
     }
 }
