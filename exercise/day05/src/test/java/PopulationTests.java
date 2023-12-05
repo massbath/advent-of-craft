@@ -10,9 +10,11 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PopulationTests {
+    public static final String SPACE = " ";
     private static List<Person> population;
 
     @BeforeAll
@@ -53,25 +55,20 @@ class PopulationTests {
                         "Glenn Quagmire");
     }
 
-    private static StringBuilder formatPopulation() {
-        final var response = new StringBuilder();
+    private static String formatPopulation() {
+        return population.stream().map(PopulationTests::formatPerson).collect(joining(lineSeparator()));
+    }
 
-        for (var person : population) {
-            response.append(format("%s %s", person.firstName(), person.lastName()));
+    private static String formatPerson(Person person) {
+        return format("%s %s%s", person.firstName(), person.lastName(), formatPets(person.pets()));
+    }
 
-            if (!person.pets().isEmpty()) {
-                response.append(" who owns : ");
-            }
-
-            for (var pet : person.pets()) {
-                response.append(pet.name()).append(" ");
-            }
-
-            if (!population.getLast().equals(person)) {
-                response.append(lineSeparator());
-            }
+    private static String formatPets(List<Pet> pets) {
+        if (pets.isEmpty()) {
+            return "";
         }
-        return response;
+
+        return pets.stream().map(Pet::name).collect(joining(SPACE, " who owns : ", SPACE));
     }
 
     @Test
