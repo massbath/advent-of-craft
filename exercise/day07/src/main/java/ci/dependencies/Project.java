@@ -13,16 +13,25 @@ public class Project {
         return new ProjectBuilder();
     }
 
-    public boolean hasTests() {
-        return testStatus != TestStatus.NO_TESTS;
+    public boolean doesntHaveTests() {
+        return testStatus == TestStatus.NO_TESTS;
     }
 
-    public String runTests() {
-        return testStatus == TestStatus.PASSING_TESTS ? "success" : "failure";
+    public JobStatus runTests() {
+        return testStatus == TestStatus.PASSING_TESTS ? JobStatus.SUCCESS : JobStatus.FAILURE;
     }
 
-    public String deploy() {
-        return buildsSuccessfully ? "success" : "failure";
+    public JobStatus deploy() {
+        return buildsSuccessfully ? JobStatus.SUCCESS : JobStatus.FAILURE;
+    }
+
+    public enum JobStatus{
+        SUCCESS,
+        FAILURE;
+
+        public boolean successfully() {
+            return SUCCESS.equals(this);
+        }
     }
 
     public static class ProjectBuilder {
