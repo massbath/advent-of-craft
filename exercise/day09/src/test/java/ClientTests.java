@@ -25,5 +25,16 @@ class ClientTests {
                         "The Dark Knight for 30.5€" + lineSeparator() +
                         "Interstellar for 23.98€" + lineSeparator() +
                         "Total : 130.97€");
+
+         statement = client.toStatement();
+
+        assertThat(client.getTotalAmount()).isEqualTo(130.97);
+    }
+
+    @Test
+    void client_should_return_total_amount() {
+        var totalAmount = client.getTotalAmount();
+
+        assertThat(totalAmount).isEqualTo(130.97);
     }
 }

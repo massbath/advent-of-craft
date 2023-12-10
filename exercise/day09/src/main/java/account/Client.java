@@ -15,7 +15,7 @@ public class Client {
         return orderLines.entrySet().stream()
                 .map(entry -> formatLine(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining(System.lineSeparator()))
-                .concat(System.lineSeparator() + "Total : " + totalAmount + "€");
+                .concat(System.lineSeparator() + "Total : " + getTotalAmount() + "€");
     }
 
     private String formatLine(String name, Double value) {
@@ -24,7 +24,7 @@ public class Client {
     }
 
     public double getTotalAmount() {
-        return totalAmount;
+        return orderLines.values().stream().reduce((double) 0, Double::sum);
     }
 }
 
